@@ -39,4 +39,44 @@ class Transaction(models.Model):
     def __str__(self):
         return self.title
 
+class UserProfile(models.Model):
+
+    CURRENCY_CHOICES = (
+        ("INR", "INR (₹)"),
+        ("USD", "USD ($)"),
+        ("GBP", "GBP (£)"),
+        ("EUR", "EUR (€)"),
+        ("JPY", "JPY (¥)"),
+        ("CNY", "CNY (¥)"),
+        ("CAD", "CAD ($)"),
+        ("AUD", "AUD ($)"),
+        ("CHF", "CHF"),
+        ("SGD", "SGD (S$)"),
+        ("AED", "AED (د.إ)"),
+        ("SAR", "SAR (ر.س)"),
+        ("KRW", "KRW (₩)"),
+        ("NZD", "NZD (NZ$)"),
+        ("ZAR", "ZAR (R)"),
+        ("BRL", "BRL (R$)"),
+        ("MXN", "MXN ($)"),
+        ("THB", "THB (฿)"),
+        ("MYR", "MYR (RM)"),
+        ("IDR", "IDR (Rp)"),
+    )
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="profile"
+    )
+
+    currency = models.CharField(
+        max_length=3,
+        choices=CURRENCY_CHOICES,
+        default="INR"
+    )
+
+    def __str__(self):
+        return f"{self.user.username} - {self.currency}"
+
 # Create your models here.

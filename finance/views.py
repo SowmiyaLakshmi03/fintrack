@@ -5,8 +5,31 @@ from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import TransactionForm
-from .models import Category, Transaction
+from .models import Category, Transaction, UserProfile
 
+# ============================================================
+# CURRENCY SYMBOLS
+# ============================================================
+
+CURRENCY_SYMBOLS = {
+    "INR": "₹",
+    "USD": "$",
+    "EUR": "€",
+    "GBP": "£",
+    "JPY": "¥",
+    "CNY": "¥",
+    "KRW": "₩",
+    "AUD": "A$",
+    "CAD": "C$",
+    "SGD": "S$",
+    "AED": "د.إ",
+    "CHF": "CHF",
+}
+
+
+# ============================================================
+# DASHBOARD
+# ============================================================
 
 @login_required
 def dashboard(request):
@@ -42,6 +65,15 @@ def dashboard(request):
     for item in category_expenses:
         item["total"] = float(item["total"])
 
+    profile, _ = UserProfile.objects.get_or_create(
+        user=request.user
+    )
+
+    currency_symbol = CURRENCY_SYMBOLS.get(
+        profile.currency,
+        "₹"
+    )
+
     return render(
         request,
         "dashboard.html",
@@ -50,14 +82,20 @@ def dashboard(request):
             "total_expenses": total_expenses,
             "balance": balance,
             "category_expenses": category_expenses,
+            "currency_symbol": currency_symbol,
+            "profile": profile,
         },
     )
 
 
+# ============================================================
+# TRANSACTIONS
+# ============================================================
+
 @login_required
 def transactions(request):
 
-    transactions = Transaction.objects.filter(
+    transaction_list = Transaction.objects.filter(
         user=request.user
     ).order_by("-date")
 
@@ -66,34 +104,49 @@ def transactions(request):
     transaction_type = request.GET.get("type", "")
 
     if search:
-        transactions = transactions.filter(
+        transaction_list = transaction_list.filter(
             title__icontains=search
         )
 
     if category:
-        transactions = transactions.filter(
+        transaction_list = transaction_list.filter(
             category_id=category
         )
 
     if transaction_type:
-        transactions = transactions.filter(
+        transaction_list = transaction_list.filter(
             transaction_type=transaction_type
         )
 
     categories = Category.objects.all()
 
+    profile, _ = UserProfile.objects.get_or_create(
+        user=request.user
+    )
+
+    currency_symbol = CURRENCY_SYMBOLS.get(
+        profile.currency,
+        "₹"
+    )
+
     return render(
         request,
         "transactions.html",
         {
-            "transactions": transactions,
+            "transactions": transaction_list,
             "categories": categories,
             "search": search,
             "selected_category": category,
             "selected_type": transaction_type,
+            "currency_symbol": currency_symbol,
+            "profile": profile,
         },
     )
 
+
+# ============================================================
+# ADD TRANSACTION
+# ============================================================
 
 @login_required
 def add_transaction(request):
@@ -116,14 +169,29 @@ def add_transaction(request):
 
         form = TransactionForm()
 
+    profile, _ = UserProfile.objects.get_or_create(
+        user=request.user
+    )
+
+    currency_symbol = CURRENCY_SYMBOLS.get(
+        profile.currency,
+        "₹"
+    )
+
     return render(
         request,
         "add_transaction.html",
         {
             "form": form,
+            "currency_symbol": currency_symbol,
+            "profile": profile,
         },
     )
 
+
+# ============================================================
+# EDIT TRANSACTION
+# ============================================================
 
 @login_required
 def edit_transaction(request, pk):
@@ -157,15 +225,30 @@ def edit_transaction(request, pk):
             instance=transaction,
         )
 
+    profile, _ = UserProfile.objects.get_or_create(
+        user=request.user
+    )
+
+    currency_symbol = CURRENCY_SYMBOLS.get(
+        profile.currency,
+        "₹"
+    )
+
     return render(
         request,
         "edit_transaction.html",
         {
             "form": form,
             "transaction": transaction,
+            "currency_symbol": currency_symbol,
+            "profile": profile,
         },
     )
 
+
+# ============================================================
+# DELETE TRANSACTION
+# ============================================================
 
 @login_required
 def delete_transaction(request, pk):
@@ -182,14 +265,29 @@ def delete_transaction(request, pk):
 
         return redirect("transactions")
 
+    profile, _ = UserProfile.objects.get_or_create(
+        user=request.user
+    )
+
+    currency_symbol = CURRENCY_SYMBOLS.get(
+        profile.currency,
+        "₹"
+    )
+
     return render(
         request,
         "delete_transaction.html",
         {
             "transaction": transaction,
+            "currency_symbol": currency_symbol,
+            "profile": profile,
         },
     )
 
+
+# ============================================================
+# REGISTER
+# ============================================================
 
 def register_view(request):
 
@@ -220,6 +318,10 @@ def register_view(request):
         },
     )
 
+
+# ============================================================
+# LOGIN
+# ============================================================
 
 def login_view(request):
 
@@ -254,8 +356,49 @@ def login_view(request):
     )
 
 
+# ============================================================
+# LOGOUT
+# ============================================================
+
 def logout_view(request):
 
     logout(request)
 
     return redirect("login")
+
+
+# ============================================================
+# CURRENCY SETTINGS
+# ============================================================
+
+@login_required
+def currency_settings(request):
+
+    profile, _ = UserProfile.objects.get_or_create(
+        user=request.user
+    )
+
+    if request.method == "POST":
+
+        currency = request.POST.get("currency")
+
+        valid_currencies = dict(
+            UserProfile.CURRENCY_CHOICES
+        )
+
+        if currency in valid_currencies:
+
+            profile.currency = currency
+
+            profile.save()
+
+            return redirect("dashboard")
+
+    return render(
+        request,
+        "currency_settings.html",
+        {
+            "profile": profile,
+            "currency_choices": UserProfile.CURRENCY_CHOICES,
+        },
+    )

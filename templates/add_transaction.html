@@ -2,14 +2,143 @@
 
 {% block content %}
 
-<h2>Add Transaction</h2>
+<div class="form-container">
 
-<form method="POST">
-    {% csrf_token %}
+    <h2>Add Transaction</h2>
 
-    {{ form.as_p }}
+    <form method="POST">
 
-    <button type="submit">Save Transaction</button>
-</form>
+        {% csrf_token %}
+
+        <!-- Title -->
+
+        <div class="form-group">
+
+            <label for="{{ form.title.id_for_label }}">
+                Title
+            </label>
+
+            {{ form.title }}
+
+            {% if form.title.errors %}
+                <div class="error">
+                    {{ form.title.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <!-- Amount -->
+
+        <div class="form-group">
+
+            <label for="{{ form.amount.id_for_label }}">
+                Amount ({{ currency_symbol }})
+            </label>
+
+            {{ form.amount }}
+
+            {% if form.amount.errors %}
+                <div class="error">
+                    {{ form.amount.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <!-- Transaction Type -->
+
+        <div class="form-group">
+
+            <label for="{{ form.transaction_type.id_for_label }}">
+                Transaction Type
+            </label>
+
+            {{ form.transaction_type }}
+
+            {% if form.transaction_type.errors %}
+                <div class="error">
+                    {{ form.transaction_type.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <!-- Category -->
+
+        <div class="form-group">
+
+            <label for="{{ form.category.id_for_label }}">
+                Category
+            </label>
+
+            {{ form.category }}
+
+            {% if form.category.errors %}
+                <div class="error">
+                    {{ form.category.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <!-- Date -->
+
+        <div class="form-group">
+
+            <label for="{{ form.date.id_for_label }}">
+                Date
+            </label>
+
+            {{ form.date }}
+
+            {% if form.date.errors %}
+                <div class="error">
+                    {{ form.date.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <!-- Description -->
+
+        <div class="form-group">
+
+            <label for="{{ form.description.id_for_label }}">
+                Description
+            </label>
+
+            {{ form.description }}
+
+            {% if form.description.errors %}
+                <div class="error">
+                    {{ form.description.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <!-- Submit -->
+
+        <button type="submit">
+            Save Transaction
+        </button>
+
+    </form>
+
+
+    <br>
+
+    <a href="{% url 'transactions' %}">
+        ← Back to Transactions
+    </a>
+
+</div>
 
 {% endblock %}

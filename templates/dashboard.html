@@ -4,29 +4,55 @@
 
 <h2>Dashboard</h2>
 
-<h3>Hello, {{ user.username|capfirst }} 👋</h3>
+<h3>
+    Hello, {{ user.username|capfirst }} 👋
+</h3>
 
 <p>Welcome back to FinTrack!</p>
 
-<!-- ==============================
+
+<!-- ==========================================
      FINANCIAL SUMMARY
-     ============================== -->
+========================================== -->
 
 <div class="dashboard-cards">
 
+    <!-- TOTAL INCOME -->
+
     <div class="finance-card income-card">
+
         <h3>Total Income</h3>
-        <p>₹{{ total_income }}</p>
+
+        <p>
+            {{ currency_symbol }}{{ total_income }}
+        </p>
+
     </div>
+
+
+    <!-- TOTAL EXPENSES -->
 
     <div class="finance-card expense-card">
+
         <h3>Total Expenses</h3>
-        <p>₹{{ total_expenses }}</p>
+
+        <p>
+            {{ currency_symbol }}{{ total_expenses }}
+        </p>
+
     </div>
+
+
+    <!-- BALANCE -->
 
     <div class="finance-card balance-card">
+
         <h3>Balance</h3>
-        <p>₹{{ balance }}</p>
+
+        <p>
+            {{ currency_symbol }}{{ balance }}
+        </p>
+
     </div>
 
 </div>
@@ -35,34 +61,38 @@
 <hr>
 
 
-<!-- ==============================
+<!-- ==========================================
      INCOME VS EXPENSES
-     ============================== -->
+========================================== -->
 
-<h3>Income vs Expenses</h3>
+<h2>Income vs Expenses</h2>
 
 <div class="chart-container">
+
     <canvas id="incomeExpenseChart"></canvas>
+
 </div>
 
 
 <hr>
 
 
-<!-- ==============================
+<!-- ==========================================
      EXPENSES BY CATEGORY
-     ============================== -->
+========================================== -->
 
-<h3>Expenses by Category</h3>
+<h2>Expenses by Category</h2>
 
 <div class="chart-container">
+
     <canvas id="categoryExpenseChart"></canvas>
+
 </div>
 
 
-<!-- ==============================
-     CHART DATA
-     ============================== -->
+<!-- ==========================================
+     DATA FOR JAVASCRIPT
+========================================== -->
 
 {{ total_income|json_script:"total-income-data" }}
 
@@ -71,40 +101,35 @@
 {{ category_expenses|json_script:"category-expenses-data" }}
 
 
-<!-- ==============================
+<!-- ==========================================
      CHART.JS
-     ============================== -->
+========================================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
 <script>
 
-    /* ==============================
+    /* ==========================================
        GET DATA FROM DJANGO
-       ============================== */
+    ========================================== */
 
-    const income = Number(
-        JSON.parse(
-            document.getElementById("total-income-data").textContent
-        )
+    const totalIncome = JSON.parse(
+        document.getElementById("total-income-data").textContent
     );
 
-    const expenses = Number(
-        JSON.parse(
-            document.getElementById("total-expenses-data").textContent
-        )
+    const totalExpenses = JSON.parse(
+        document.getElementById("total-expenses-data").textContent
     );
-
 
     const categoryExpenses = JSON.parse(
         document.getElementById("category-expenses-data").textContent
     );
 
 
-    /* ==============================
+    /* ==========================================
        INCOME VS EXPENSES CHART
-       ============================== */
+    ========================================== */
 
     const incomeExpenseCanvas =
         document.getElementById("incomeExpenseChart");
@@ -122,10 +147,14 @@
             ],
 
             datasets: [{
+
                 data: [
-                    income,
-                    expenses
-                ]
+                    totalIncome,
+                    totalExpenses
+                ],
+
+                borderWidth: 1
+
             }]
 
         },
@@ -136,13 +165,18 @@
 
             plugins: {
 
-                legend: {
-                    position: "bottom"
+                title: {
+
+                    display: true,
+
+                    text: "Income vs Expenses"
+
                 },
 
-                title: {
-                    display: true,
-                    text: "Income vs Expenses"
+                legend: {
+
+                    position: "bottom"
+
                 }
 
             }
@@ -152,25 +186,19 @@
     });
 
 
-    /* ==============================
-       EXPENSE CATEGORY DATA
-       ============================== */
+    /* ==========================================
+       EXPENSES BY CATEGORY
+    ========================================== */
 
-    const categoryLabels =
-        categoryExpenses.map(
-            item => item.category__name
-        );
-
-
-    const categoryValues =
-        categoryExpenses.map(
-            item => Number(item.total)
-        );
+    const categoryLabels = categoryExpenses.map(
+        item => item.category__name
+    );
 
 
-    /* ==============================
-       EXPENSES BY CATEGORY CHART
-       ============================== */
+    const categoryValues = categoryExpenses.map(
+        item => item.total
+    );
+
 
     const categoryExpenseCanvas =
         document.getElementById("categoryExpenseChart");
@@ -186,7 +214,9 @@
 
             datasets: [{
 
-                data: categoryValues
+                data: categoryValues,
+
+                borderWidth: 1
 
             }]
 
@@ -198,13 +228,18 @@
 
             plugins: {
 
-                legend: {
-                    position: "bottom"
+                title: {
+
+                    display: true,
+
+                    text: "Expenses by Category"
+
                 },
 
-                title: {
-                    display: true,
-                    text: "Expenses by Category"
+                legend: {
+
+                    position: "bottom"
+
                 }
 
             }
