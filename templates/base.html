@@ -1,0 +1,77 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FinTrack</title>
+
+    <!-- FinTrack CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header>
+
+        <h1>FinTrack</h1>
+
+        <!-- Navigation -->
+        <nav>
+
+            <a href="{% url 'dashboard' %}">
+                Dashboard
+            </a>
+
+            <a href="{% url 'transactions' %}">
+                Transactions
+            </a>
+
+            <a href="{% url 'add_transaction' %}">
+                Add Transaction
+            </a>
+
+            {% if user.is_authenticated %}
+
+                <form
+                    action="{% url 'logout' %}"
+                    method="post"
+                    style="display: inline;"
+                >
+                    {% csrf_token %}
+
+                    <button type="submit">
+                        Logout
+                    </button>
+                </form>
+
+            {% else %}
+
+                <a href="{% url 'login' %}">
+                    Login
+                </a>
+
+            {% endif %}
+
+        </nav>
+
+    </header>
+
+
+    <!-- Main Content -->
+    <main>
+
+        {% block content %}
+
+        {% endblock %}
+
+    </main>
+
+
+</body>
+
+</html>

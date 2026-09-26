@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Transactions</h2>
+
+<p>View and manage your income and expenses.</p>
+
+
+<!-- ==============================
+     SEARCH AND FILTER
+     ============================== -->
+
+<form method="GET" class="filter-form">
+
+    <input
+        type="text"
+        name="search"
+        placeholder="Search by title"
+        value="{{ search }}"
+    >
+
+    <select name="category">
+
+        <option value="">
+            All Categories
+        </option>
+
+        {% for category in categories %}
+
+        <option
+            value="{{ category.id }}"
+            {% if selected_category == category.id|stringformat:"s" %}
+                selected
+            {% endif %}
+        >
+            {{ category.name }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+
+    <select name="type">
+
+        <option value="">
+            All Types
+        </option>
+
+        <option
+            value="income"
+            {% if selected_type == "income" %}
+                selected
+            {% endif %}
+        >
+            Income
+        </option>
+
+        <option
+            value="expense"
+            {% if selected_type == "expense" %}
+                selected
+            {% endif %}
+        >
+            Expense
+        </option>
+
+    </select>
+
+
+    <button type="submit">
+        Filter
+    </button>
+
+
+    <a href="{% url 'transactions' %}">
+        Clear
+    </a>
+
+</form>
+
+
+<!-- ==============================
+     ADD TRANSACTION
+     ============================== -->
+
+<div class="add-transaction-container">
+
+    <a
+        href="{% url 'add_transaction' %}"
+        class="add-transaction-button"
+    >
+        + Add Transaction
+    </a>
+
+</div>
+
+
+<!-- ==============================
+     TRANSACTIONS TABLE
+     ============================== -->
+
+{% if transactions %}
+
+<div class="table-container">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Title</th>
+
+                <th>Amount</th>
+
+                <th>Type</th>
+
+                <th>Category</th>
+
+                <th>Date</th>
+
+                <th>Description</th>
+
+                <th>Actions</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for transaction in transactions %}
+
+            <tr>
+
+                <td>
+                    {{ transaction.title }}
+                </td>
+
+
+                <td>
+                    ₹{{ transaction.amount }}
+                </td>
+
+
+                <td>
+
+                    {% if transaction.transaction_type == "income" %}
+
+                        <span class="income-label">
+                            Income
+                        </span>
+
+                    {% else %}
+
+                        <span class="expense-label">
+                            Expense
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+                    {{ transaction.category.name }}
+                </td>
+
+
+                <td>
+                    {{ transaction.date }}
+                </td>
+
+
+                <td>
+                    {{ transaction.description }}
+                </td>
+
+
+                <td class="action-buttons">
+
+                    <a
+                        href="{% url 'edit_transaction' transaction.pk %}"
+                        class="edit-button"
+                    >
+                        Edit
+                    </a>
+
+
+                    <a
+                        href="{% url 'delete_transaction' transaction.pk %}"
+                        class="delete-button"
+                    >
+                        Delete
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% else %}
+
+<div class="empty-transactions">
+
+    <h3>No transactions found</h3>
+
+    <p>
+        You haven't added any transactions matching your filters.
+    </p>
+
+    <a
+        href="{% url 'add_transaction' %}"
+        class="add-transaction-button"
+    >
+        + Add Your First Transaction
+    </a>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

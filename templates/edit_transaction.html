@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="edit-transaction-container">
+
+    <h2>Edit Transaction</h2>
+
+    <p>
+        Update the details of your transaction below.
+    </p>
+
+    <form method="POST" class="transaction-form">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <div class="edit-actions">
+
+            <button
+                type="submit"
+                class="update-button"
+            >
+                Update Transaction
+            </button>
+
+            <a
+                href="{% url 'transactions' %}"
+                class="cancel-button"
+            >
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

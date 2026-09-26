@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Login to FinTrack</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <label>
+        <input type="checkbox" id="showPassword">
+        Show password
+    </label>
+
+    <br><br>
+
+    <button type="submit">Login</button>
+</form>
+
+<br>
+
+<p>
+    Don't have an account?
+    <a href="{% url 'register' %}">Create an account</a>
+</p>
+
+<script>
+    const showPassword = document.getElementById("showPassword");
+    const passwordField = document.getElementById("id_password");
+
+    showPassword.addEventListener("change", function () {
+        if (this.checked) {
+            passwordField.type = "text";
+        } else {
+            passwordField.type = "password";
+        }
+    });
+</script>
+
+{% endblock %}
