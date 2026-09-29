@@ -2,6 +2,8 @@
 
 A full-stack personal finance tracking application built with Django and PostgreSQL to help users manage income, expenses, transactions, and financial records in one place.
 
+🔗 **Live Demo:** https://fintrack-e47s.onrender.com
+
 ## 📌 About the Project
 
 FinTrack is designed to provide a simple and organized workspace for managing personal finances without relying on spreadsheets or scattered records.
